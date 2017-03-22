@@ -6,4 +6,22 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="text_size_ss">8dp</dimen>
+    <dimen name="text_size_s">16dp</dimen>
+    <dimen name="text_size_n">24dp</dimen>
+    <dimen name="text_size_l">32dp</dimen>
+    <dimen name="text_size_ll">40dp</dimen>
+
+    <dimen name="imageView_size_ss">25dp</dimen>
+    <dimen name="imageView_size_s">50dp</dimen>
+    <dimen name="imageView_size_n">100dp</dimen>
+    <dimen name="imageView_size_l">150dp</dimen>
+    <dimen name="imageView_size_ll">250dp</dimen>
+
+    <dimen name="space_ss">5dp</dimen>
+    <dimen name="space_s">10dp</dimen>
+    <dimen name="space_n">15dp</dimen>
+    <dimen name="space_l">20dp</dimen>
+    <dimen name="space_ll">25dp</dimen>
 </resources>

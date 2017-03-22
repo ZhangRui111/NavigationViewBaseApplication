@@ -1,10 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="fragment settings"
+
+    <net.qiujuer.genius.ui.widget.TextView
+        android:layout_gravity="center_horizontal"
+        android:text="choose_user_icon"
+        android:textSize="@dimen/text_size_n"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <net.qiujuer.genius.ui.widget.ImageView
+        android:id="@+id/imageView_user_icon"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@mipmap/ic_launcher"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
+    <net.qiujuer.genius.ui.widget.Button
+        android:id="@+id/button_take_from_camera"
+        android:text="拍照"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <net.qiujuer.genius.ui.widget.Button
+        android:id="@+id/button_take_from_galley"
+        android:text="相册"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </LinearLayout>

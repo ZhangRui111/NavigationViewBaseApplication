@@ -43,7 +43,7 @@ public class UtilsLibrary {
      * @param photoPath
      * @return
      */
-    public static Bitmap decodeFile(String photoPath){
+    public static Bitmap decodeFileUtils(String photoPath){
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(photoPath, options);

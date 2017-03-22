@@ -4,10 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
@@ -16,7 +15,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,28 +25,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zhy.m.permission.MPermissions;
-import com.zhy.m.permission.PermissionDenied;
-import com.zhy.m.permission.PermissionGrant;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.PermissionListener;
 
+import java.util.List;
+
+import static com.example.john.lifeclock10.UtilsFinalArguments.REQUEST_CAMERO;
 import static com.example.john.lifeclock10.UtilsFinalArguments.REQUEST_USUAL;
+import static com.example.john.lifeclock10.UtilsFinalArguments.REQUEST_WRITE_EXTERNAL_STORAGE;
+import static com.example.john.lifeclock10.UtilsLibrary.decodeFileUtils;
 
 public class ActivityMain extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    //基本的UI部件
+    //base UIs
     private Toolbar toolbar;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
     private NavigationView navigationView;
     private TextView toolbarTitle;
 
-    //碎片管理FragmentManager
+    //FragmentManager
     private FragmentManager mFragmentManager = null;
     private FragmentTransaction mFragmentTransaction = null;
     private FragmentMain fragmentMain = null;
     private FragmentSettings fragmentSettings = null;
 
+    //nav_header
     private TextView drawerUserNameTxv;  //侧边栏上部姓名
     private ImageView drawerUserIcon;  //侧边栏上部头像
 
@@ -97,30 +100,104 @@ public class ActivityMain extends BaseActivity
 
         //nav_header
         View headerLayout = navigationView.getHeaderView(0);   //没有这一行时，drawerUserNameTxv的findviewById的结果是null
-        drawerUserNameTxv = (TextView) headerLayout.findViewById(R.id.txt_name);
-        drawerUserIcon = (ImageView) headerLayout.findViewById(R.id.imageView);
-        drawerUserIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //do something
-            }
-        });
+        drawerUserNameTxv = (TextView) headerLayout.findViewById(R.id.txt_name_header);
+        drawerUserIcon = (ImageView) headerLayout.findViewById(R.id.imageView_user_icon_header);
     }
 
     private void initPermission() {
-        //获取定位权限
-        //MPermissions.requestPermissions(ActivityMain.this, REQUEST_ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION);
-        //获取准确信息
-        //MPermissions.requestPermissions(ActivityMain.this, REQUEST_ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
-
+        // 先判断是否有权限。
+        if (!AndPermission.hasPermission(this, Manifest.permission.CAMERA)) {
+            // 申请权限。
+            AndPermission.with(this)
+                    .requestCode(REQUEST_CAMERO)
+                    .permission(Manifest.permission.CAMERA)
+                    .send();
+        }
+        if (!AndPermission.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            // 申请权限。
+            AndPermission.with(this)
+                    .requestCode(REQUEST_WRITE_EXTERNAL_STORAGE)
+                    .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .send();
+        }
     }
 
-    private void initClickEvent() {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // 只需要调用这一句，其它的交给AndPermission吧，最后一个参数是PermissionListener。
+        AndPermission.onRequestPermissionsResult(requestCode, permissions, grantResults, listener);
+    }
 
+    private PermissionListener listener = new PermissionListener() {
+        @Override
+        public void onSucceed(int requestCode, List<String> grantedPermissions) {
+            // 权限申请成功回调。
+            if(requestCode == REQUEST_CAMERO) {
+                // TODO 相应代码。
+                //do nothing
+            } else if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
+                // TODO 相应代码。
+                //do nothing
+            }
+        }
+
+        @Override
+        public void onFailed(int requestCode, List<String> deniedPermissions) {
+            // 权限申请失败回调。
+
+            // 用户否勾选了不再提示并且拒绝了权限，那么提示用户到设置中授权。
+            if (AndPermission.hasAlwaysDeniedPermission(ActivityMain.this, deniedPermissions)) {
+                // 第一种：用默认的提示语。
+                //AndPermission.defaultSettingDialog(ActivityMain.this, REQUEST_USUAL).show();
+
+                // 第二种：用自定义的提示语。
+                AndPermission.defaultSettingDialog(ActivityMain.this, REQUEST_USUAL)
+                 .setTitle("权限申请失败")
+                 .setMessage("我们需要的一些权限被您拒绝或者系统发生错误申请失败，请您到设置页面手动授权，否则功能无法正常使用！")
+                 .setPositiveButton("好，去设置")
+                 .show();
+
+                // 第三种：自定义dialog样式。
+                // SettingService settingService =
+                //    AndPermission.defineSettingDialog(ActivityMain.this, REQUEST_USUAL);
+                // 你的dialog点击了确定调用：
+                // settingService.execute();
+                // 你的dialog点击了取消调用：
+                // settingService.cancel();
+            }
+        }
+    };
+
+    private void initClickEvent() {
+        drawerUserNameTxv.setOnClickListener(this);
+        drawerUserIcon.setOnClickListener(this);
     }
 
     private void initData() {
+        //加载第一个Fragment
+        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
+        if(fragmentMain == null){
+            fragmentMain = new FragmentMain();
+            mFragmentTransaction.replace(R.id.main_fragment_layout,fragmentMain);
+        }else{
+            mFragmentTransaction.show(fragmentMain);
+        }
+        mFragmentTransaction.commit();
+    }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.txt_name_header:
+                //doSomething
+                break;
+            case R.id.imageView_user_icon_header:
+                //doSomething
+                break;
+            default:
+                break;
+
+        }
     }
 
     @Override
@@ -220,25 +297,22 @@ public class ActivityMain extends BaseActivity
         }
     }
 
-    //用于申请权限
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-    {
-        MPermissions.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-
-    @PermissionGrant(REQUEST_USUAL)
-    public void requestSdcardSuccess()
-    {
-        Toast.makeText(this, "GRANT ACCESS PERMISSION!", Toast.LENGTH_SHORT).show();
-    }
-
-    @PermissionDenied(REQUEST_USUAL)
-    public void requestSdcardFailed()
-    {
-        Toast.makeText(this, "DENY ACCESS PERMISSION!", Toast.LENGTH_SHORT).show();
+    /**
+     * 设置nav_header的头像和昵称
+     * @param name
+     * @param iconPath
+     */
+    private void funcSetNavHeader(String name, String iconPath) {
+        if (name == null && iconPath != null) {
+            //只修改头像
+            decodeFileUtils(iconPath);
+        } else if (iconPath == null && name != null) {
+            //只修改昵称
+            drawerUserNameTxv.setText(name);
+        } else {
+            drawerUserNameTxv.setText(name);
+            decodeFileUtils(iconPath);
+        }
     }
 
     /**
@@ -246,9 +320,6 @@ public class ActivityMain extends BaseActivity
      * @param fragmentTransaction
      */
     private void hideAllFragment(FragmentTransaction fragmentTransaction){
-        /**
-         * 4
-         */
         if (fragmentMain != null){
             fragmentTransaction.hide(fragmentMain);
         }
